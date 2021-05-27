@@ -2,7 +2,7 @@ using GraphQL.Test.GQL.Data;
 using GraphQL.Test.GQL.GraphQL;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +32,9 @@ namespace GraphQL.Test.GQL
                 .AddType<DataLeakType>()
                 .AddFiltering()
                 .AddSorting();
+
+                
+            services.AddCors();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -42,6 +45,11 @@ namespace GraphQL.Test.GQL
             }
 
             app.UseRouting();
+
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
 
             app.UseEndpoints(endpoints =>
             {

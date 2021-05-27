@@ -4,7 +4,7 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Below is a simulated visualization layer of a data network using Chart Js & GraphQL.</p>
+    <p>Below is a simulated visualization layer of a data network using Chart Js & GraphQL with HotChocolate.</p>
 </div>
 
 <div class="mt-3">
@@ -13,32 +13,64 @@
 
 
 <script>
-    const labels = [
-        'January',
-        'February',
-        'March',
-        'April',
-        'May',
-        'June',
-    ];
-    const data = {
-        labels: labels,
-        datasets: [{
-            label: 'My First dataset',
-            backgroundColor: 'rgb(255, 99, 132)',
-            borderColor: 'rgb(255, 99, 132)',
-            data: [0, 10, 5, 2, 20, 30, 45],
-        }]
-    };
 
-    const config = {
-        type: 'line',
-        data,
-        options: {}
-    };
+    $.ajax({
+        method: "POST",
+        url: "http://localhost:5000/graphql",
+        contentType: "application/json",
+        data: JSON.stringify({
+            query: `query {
+                userNodes: user {
+                    id: name
+                }
+                dataLeakNodes: dataLeak {
+                    id: breachSource
+                }
+                links: dataLeak {
+                    source: user {
+                        id: name
+                    }
+                    target: breachSource
+                }
+            }`
+        })
+    }).done(function (response, status) {
+        var data = {};
+        data.nodes = response.data.userNodes.concat(response.data.dataLeakNodes);
+        data.links = response.data.links.map(function (x) { return { "source": x.source.id, "target": x.target } });
 
-    var myChart = new Chart(
-        document.getElementById('myChart'),
-        config
-    );
+        var myChart = new Chart(document.getElementById('myChart').getContext('2d'), {
+            type: 'forceDirectedGraph',
+            data: {
+                labels: data.nodes.map((d) => d.id),
+                datasets: [
+                    {
+                        pointBackgroundColor: 'steelblue',
+                        pointRadius: 5,
+                        data: data.nodes,
+                        edges: data.links,
+                    },
+                ]
+            },
+            options: {
+                legend: {
+                    display: false,
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function (tooltipItem, data) {
+                            var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                            return label;
+                        }
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Data Visualization'
+                }
+            },
+        });
+        
+        myChart.update();
+    });
 </script>
