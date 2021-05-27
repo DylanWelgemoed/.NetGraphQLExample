@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Visualization";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Below is a simulated visualization layer of a data network using Chart Js & GraphQL.</p>
+</div>
+
+<div class="mt-3">
+    <canvas id="myChart"></canvas>
+</div>
+
+
+<script>
+    const labels = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+    ];
+    const data = {
+        labels: labels,
+        datasets: [{
+            label: 'My First dataset',
+            backgroundColor: 'rgb(255, 99, 132)',
+            borderColor: 'rgb(255, 99, 132)',
+            data: [0, 10, 5, 2, 20, 30, 45],
+        }]
+    };
+
+    const config = {
+        type: 'line',
+        data,
+        options: {}
+    };
+
+    var myChart = new Chart(
+        document.getElementById('myChart'),
+        config
+    );
+</script>
